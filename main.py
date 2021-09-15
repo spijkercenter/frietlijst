@@ -1,5 +1,4 @@
 import datetime
-import functools
 from typing import List, Dict
 
 from flask import render_template
@@ -8,9 +7,18 @@ from googleapiclient.discovery import build
 
 
 class Item:
-    def __init__(self, name, amount):
+    def __init__(self, name: str, amount: int):
+        assert name == name.lower()
         self.name = name
         self.amount = amount
+        self.__contains_fries = 'friet' in self.name or 'twister' in self.name
+
+    def __lt__(self: "Item", other: "Item") -> bool:
+        if self.__contains_fries and not other.__contains_fries:
+            return True
+        if not self.__contains_fries and other.__contains_fries:
+            return False
+        return self.name < other.name
 
 
 class Order:
@@ -41,8 +49,7 @@ class DTO:
 
     @property
     def items(self) -> List[Item]:
-        return sorted([Item(name, amount) for name, amount in self.__items.items()],
-                      key=functools.cmp_to_key(_compare_items))
+        return sorted([Item(name, amount) for name, amount in self.__items.items()])
 
     @property
     def applicants(self) -> List[str]:
@@ -72,21 +79,6 @@ def process(_) -> str:
         _cache_value = _get_data()
         _cache_moment = datetime.datetime.now()
     return render_template('frietlijst.html', dto=_cache_value)
-
-
-def _is_friet(item: Item):
-    return 'friet' in item.name or 'twister' in item.name
-
-
-def _compare_items(lhs: Item, rhs: Item) -> int:
-    if _is_friet(lhs) and not _is_friet(rhs):
-        return -1
-    elif _is_friet(rhs) and not _is_friet(lhs):
-        return 1
-    elif lhs.name > rhs.name:
-        return 1
-    else:
-        return -1
 
 
 def _anonymize_name(name: str) -> str:
