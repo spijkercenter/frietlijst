@@ -10,7 +10,10 @@ class DTO:
         self.__items: Dict[str, int] = {}
         self.__orders: List[Order] = []
 
-    def add(self, applicant_name: str, item_names: List[str]):
+    def add(self,
+            applicant_name: str,
+            item_names: List[str]
+            ) -> None:
         self.__applicants.append(applicant_name)
 
         for item_name in item_names:

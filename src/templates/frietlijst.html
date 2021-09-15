@@ -8,20 +8,20 @@
 <div class="markdown-body">
     <h1>Reeds besteld</h1>
     <ol>
-        {% for applicant in dto.applicants %}
+        {% for applicant in data.applicants %}
         <li>{{ applicant }}</li>
         {% endfor %}
     </ol>
 
     <h1>Streeplijst</h1>
     <ul>
-        {% for item in dto.items %}
+        {% for item in data.items %}
         <li>{{ item.name }}: {{ item.amount }}</li>
         {% endfor %}
     </ul>
     <h1>Totaaloverzicht</h1>
     <ul>
-        {% for order in dto.orders %}
+        {% for order in data.orders %}
         <li>
             {{ order.name }}
             <ul>
@@ -35,8 +35,9 @@
     <p> Heb je feedback?
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSddGpp9kbvW9QfLVATOM3pJqhq1ci0_gdZdpGmXmkPRMoiLEw/viewform?usp=sf_link"
            target="_blank">Klik hier!</a></p>
-    <p>Wil je de code van deze pagina zien of hieraan bijdragen? <a href="https://github.com/spijkercenter/frietlijst"
-                                                                    target="_blank">Klik hier!</a>
+    <p>Wil je de code van deze pagina zien of hieraan bijdragen?
+        <a href="https://github.com/spijkercenter/frietlijst"
+           target="_blank">Klik hier!</a>
     </p>
 </div>
 </body>

@@ -8,9 +8,8 @@ from repository import Repository
 
 
 def process(_) -> str:
-    global _repository
     data = _get_data()
-    return render_template('frietlijst.html', dto=data)
+    return render_template('frietlijst.html', data=data)
 
 
 def anonymize_name(name: str) -> str:
@@ -22,7 +21,7 @@ def anonymize_name(name: str) -> str:
     return result
 
 
-@cached(cache=TTLCache(maxsize=2, ttl=10))
+@cached(cache=TTLCache(maxsize=1, ttl=10))
 def _get_data() -> DTO:
     cutoff = datetime.datetime.now() - datetime.timedelta(days=4)
 
