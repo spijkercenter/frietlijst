@@ -1,6 +1,7 @@
 #!/bin/bash
 zip deployable.zip \
-  templates/frietlijst.html \
+  templates/*.html \
+  models/*.py \
   main.py \
   token.json \
   requirements.txt

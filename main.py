@@ -1,64 +1,11 @@
 import datetime
-from typing import List, Dict
+from typing import List
 
 from flask import render_template
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 
-
-class Item:
-    def __init__(self, name: str, amount: int):
-        assert name == name.lower()
-        self.name = name
-        self.amount = amount
-        self.__contains_fries = 'friet' in self.name or 'twister' in self.name
-
-    def __lt__(self: "Item", other: "Item") -> bool:
-        if self.__contains_fries and not other.__contains_fries:
-            return True
-        if not self.__contains_fries and other.__contains_fries:
-            return False
-        return self.name < other.name
-
-
-class Order:
-    def __init__(self, value: List[str]):
-        self.name = _anonymize_name(value[1])
-        self.items = [v for v in value[2:] if v]
-
-
-class DTO:
-    def __init__(self):
-        self.__applicants: List[str] = []
-        self.__items: Dict[str, int] = {}
-        self.__orders: List[Order] = []
-
-    def process_value(self, value: List[str]) -> None:
-        # applications
-        self.__applicants.append(_anonymize_name(value[1]))
-        # items
-        for item in value[2:]:
-            if item:
-                item_name = item.lower().strip()
-                if item_name in self.__items:
-                    self.__items[item_name] += 1
-                else:
-                    self.__items[item_name] = 1
-        # orders
-        self.__orders.append(Order(value))
-
-    @property
-    def items(self) -> List[Item]:
-        return sorted([Item(name, amount) for name, amount in self.__items.items()])
-
-    @property
-    def applicants(self) -> List[str]:
-        return sorted(self.__applicants)
-
-    @property
-    def orders(self) -> List[Order]:
-        return sorted(self.__orders, key=lambda o: o.name)
-
+from models.dto import DTO
 
 _SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
@@ -90,22 +37,27 @@ def _anonymize_name(name: str) -> str:
     return result
 
 
-def _get_data() -> DTO:
+def _load_values() -> List[List[str]]:
     credentials: Credentials = Credentials.from_service_account_file('token.json', scopes=_SCOPES)
-
     service = build('sheets', 'v4', credentials=credentials)
     sheets = service.spreadsheets()
     result = sheets.values().get(spreadsheetId=_SHEET_ID, range=_RANGE).execute()
     values = result.get('values', [])
+    return values
 
+
+def _get_data() -> DTO:
     cutoff = datetime.datetime.now() - datetime.timedelta(days=4)
+
+    rows_to_process = [row for row in _load_values()
+                       if row and datetime.datetime.strptime(row[0], '%d-%m-%Y %H:%M:%S') > cutoff]
 
     result = DTO()
 
-    for value in values:
-        if value:
-            moment = datetime.datetime.strptime(value[0], '%d-%m-%Y %H:%M:%S')
-            if moment > cutoff:
-                result.process_value(value)
+    for row in rows_to_process:
+        result.add(
+            applicant_name=_anonymize_name(row[1]),
+            item_names=[item_name.lower().strip() for item_name in row[2:]],
+        )
 
     return result
