@@ -1,24 +1,28 @@
 import datetime
-from typing import List
+from typing import Optional
 
 from flask import render_template
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
 
 from models.dto import DTO
+from repository import Repository
 
-_SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-
-_SHEET_ID = "18vCgc5DGUiFZN1NX_GBmxSBCb47KdsBkV6Glf9Sx-wE"
-_RANGE = 'Friet bestelling!A2:F'
+_repository: Optional[Repository] = None
 
 _cache_moment = datetime.datetime.now() - datetime.timedelta(days=1)
 _cache_value = DTO()
 
 
 def process(_) -> str:
+    global _repository
     global _cache_value
     global _cache_moment
+
+    if not _repository:
+        _repository = Repository(
+            sa_file_name='token.json',
+            spreadsheet_id='18vCgc5DGUiFZN1NX_GBmxSBCb47KdsBkV6Glf9Sx-wE',
+            spreadsheet_range='Friet bestelling!A2:F',
+        )
 
     rerun_if_later_than = _cache_moment + datetime.timedelta(seconds=10)
     now = datetime.datetime.now()
@@ -28,7 +32,7 @@ def process(_) -> str:
     return render_template('frietlijst.html', dto=_cache_value)
 
 
-def _anonymize_name(name: str) -> str:
+def anonymize_name(name: str) -> str:
     parts = name.split(" ")
     result = parts[0]
     for part in parts[1:]:
@@ -37,26 +41,17 @@ def _anonymize_name(name: str) -> str:
     return result
 
 
-def _load_values() -> List[List[str]]:
-    credentials: Credentials = Credentials.from_service_account_file('token.json', scopes=_SCOPES)
-    service = build('sheets', 'v4', credentials=credentials)
-    sheets = service.spreadsheets()
-    result = sheets.values().get(spreadsheetId=_SHEET_ID, range=_RANGE).execute()
-    values = result.get('values', [])
-    return values
-
-
 def _get_data() -> DTO:
     cutoff = datetime.datetime.now() - datetime.timedelta(days=4)
 
-    rows_to_process = [row for row in _load_values()
+    rows_to_process = [row for row in _repository.load_rows()
                        if row and datetime.datetime.strptime(row[0], '%d-%m-%Y %H:%M:%S') > cutoff]
 
     result = DTO()
 
     for row in rows_to_process:
         result.add(
-            applicant_name=_anonymize_name(row[1]),
+            applicant_name=anonymize_name(row[1]),
             item_names=[item_name.lower().strip() for item_name in row[2:]],
         )
 

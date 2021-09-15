@@ -2,4 +2,4 @@ __pycache__/
 .idea/
 .venv
 deployable.zip
-token.json
+src/token.json
