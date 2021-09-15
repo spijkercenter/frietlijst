@@ -6,7 +6,7 @@ De applicatie is te benaderen via: https://europe-west1-friet-azg.cloudfunctions
 
 ## Lokaal draaien
 Eenmalig:
-- Download de service account credentials als `token.json`
+- Download de service account credentials als `src/token.json`
 - Installeer de requirements.txt
 - `pip install functions-framework`
 
@@ -15,7 +15,7 @@ Telkens:
 
 ## Deployen
 Eenmalig
-- Download de service account credentials als `token.json`
+- Download de service account credentials als `src/token.json`
 
 Telkens
 - `bash pack.sh`
