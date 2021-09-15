@@ -1,6 +1,7 @@
 import datetime
 from typing import Optional
 
+from cachetools import cached, TTLCache
 from flask import render_template
 
 from models.dto import DTO
@@ -8,14 +9,9 @@ from repository import Repository
 
 _repository: Optional[Repository] = None
 
-_cache_moment = datetime.datetime.now() - datetime.timedelta(days=1)
-_cache_value = DTO()
-
 
 def process(_) -> str:
     global _repository
-    global _cache_value
-    global _cache_moment
 
     if not _repository:
         _repository = Repository(
@@ -24,12 +20,8 @@ def process(_) -> str:
             spreadsheet_range='Friet bestelling!A2:F',
         )
 
-    rerun_if_later_than = _cache_moment + datetime.timedelta(seconds=10)
-    now = datetime.datetime.now()
-    if now > rerun_if_later_than:
-        _cache_value = _get_data()
-        _cache_moment = datetime.datetime.now()
-    return render_template('frietlijst.html', dto=_cache_value)
+    data = _get_data()
+    return render_template('frietlijst.html', dto=data)
 
 
 def anonymize_name(name: str) -> str:
@@ -41,6 +33,7 @@ def anonymize_name(name: str) -> str:
     return result
 
 
+@cached(cache=TTLCache(maxsize=2, ttl=10))
 def _get_data() -> DTO:
     cutoff = datetime.datetime.now() - datetime.timedelta(days=4)
 
