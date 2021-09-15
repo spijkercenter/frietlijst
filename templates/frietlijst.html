@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+    <title>Frietlijst by Ivo</title>
+    <link rel="stylesheet" href="https://unpkg.com/github-markdown-css@4.0.0/github-markdown.css"/>
+</head>
+<body>
+    <div class="markdown-body">
+        <h1>Reeds besteld</h1>
+        <ol>
+            {% for applicant in dto.applicants %}
+            <li>{{ applicant }}</li>
+            {% endfor %}
+        </ol>
+
+        <h1>Streeplijst</h1>
+        <ul>
+            {% for item in dto.items %}
+            <li>{{ item.name }}: {{ item.amount }}</li>
+            {% endfor %}
+        </ul>
+        <h1>Totaaloverzicht</h1>
+        <ul>
+            {% for order in dto.orders %}
+            <li>
+                {{ order.name }}
+                <ul>
+                    {% for item in order.items %}
+                    <li>{{ item }}</li>
+                    {% endfor%}
+                </ul>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
