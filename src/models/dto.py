@@ -29,6 +29,10 @@ class DTO:
         return sorted([Item(name, amount) for name, amount in self.__items.items()])
 
     @property
+    def item_count(self) -> int:
+        return sum(self.__items.values())
+
+    @property
     def applicants(self) -> List[str]:
         return sorted(self.__applicants)
 

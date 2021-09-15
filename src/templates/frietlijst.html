@@ -13,7 +13,7 @@
         {% endfor %}
     </ol>
 
-    <h1>Streeplijst</h1>
+    <h1>Streeplijst - {{ data.item_count }} stuks</h1>
     <ul>
         {% for item in data.items %}
         <li>{{ item.name }}: {{ item.amount }}</li>
