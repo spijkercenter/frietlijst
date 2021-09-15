@@ -98,7 +98,7 @@ def _anonymize_name(name: str) -> str:
     return result
 
 
-def _get_data():
+def _get_data() -> DTO:
     credentials: Credentials = Credentials.from_service_account_file('token.json', scopes=_SCOPES)
 
     service = build('sheets', 'v4', credentials=credentials)
