@@ -1,5 +1,4 @@
 import datetime
-from typing import Optional
 
 from cachetools import cached, TTLCache
 from flask import render_template
@@ -7,19 +6,9 @@ from flask import render_template
 from models.dto import DTO
 from repository import Repository
 
-_repository: Optional[Repository] = None
-
 
 def process(_) -> str:
     global _repository
-
-    if not _repository:
-        _repository = Repository(
-            sa_file_name='token.json',
-            spreadsheet_id='18vCgc5DGUiFZN1NX_GBmxSBCb47KdsBkV6Glf9Sx-wE',
-            spreadsheet_range='Friet bestelling!A2:F',
-        )
-
     data = _get_data()
     return render_template('frietlijst.html', dto=data)
 
@@ -49,3 +38,11 @@ def _get_data() -> DTO:
         )
 
     return result
+
+
+if __name__ == 'main':
+    _repository = Repository(
+        sa_file_name='token.json',
+        spreadsheet_id='18vCgc5DGUiFZN1NX_GBmxSBCb47KdsBkV6Glf9Sx-wE',
+        spreadsheet_range='Friet bestelling!A2:F',
+    )
