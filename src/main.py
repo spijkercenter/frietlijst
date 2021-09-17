@@ -3,7 +3,8 @@ import datetime
 from cachetools import cached, TTLCache
 from flask import render_template
 
-from models.dto import DTO
+from models.order import Order
+from models.order_total import OrderTotal
 from repository import Repository
 
 
@@ -22,19 +23,19 @@ def anonymize_name(name: str) -> str:
 
 
 @cached(cache=TTLCache(maxsize=1, ttl=10))
-def _get_data() -> DTO:
-    cutoff = datetime.datetime.now() - datetime.timedelta(days=4)
+def _get_data() -> OrderTotal:
+    cutoff = datetime.datetime.now() - datetime.timedelta(days=2)
 
     rows_to_process = [row for row in _repository.load_rows()
                        if row and datetime.datetime.strptime(row[0], '%d-%m-%Y %H:%M:%S') > cutoff]
 
-    result = DTO()
+    result = OrderTotal()
 
     for row in rows_to_process:
-        result.add(
+        result.add(Order(
             applicant_name=anonymize_name(row[1]),
             item_names=[item_name.lower().strip() for item_name in row[2:]],
-        )
+        ))
 
     return result
 
