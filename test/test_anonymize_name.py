@@ -1,6 +1,6 @@
 import unittest
 
-from main import anonymize_name
+from order_repository import anonymize_name
 
 
 class TestMain(unittest.TestCase):
