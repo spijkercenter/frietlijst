@@ -7,7 +7,7 @@ from order_repository import OrderRepository
 
 
 def process(_) -> str:
-    min_datetime = datetime.now() - timedelta(days=200)
+    min_datetime = datetime.now() - timedelta(days=2)
     orders = _repository.find_by_datetime_placed_greater_than(min_datetime)
 
     items = ItemService.get_items_from_orders(orders)
