@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from cachetools import cached, TTLCache
 from flask import render_template
 
 from item_service import ItemService
@@ -7,6 +8,11 @@ from order_repository import OrderRepository
 
 
 def process(_) -> str:
+    return process_cached()
+
+
+@cached(cache=TTLCache(maxsize=1, ttl=10))
+def process_cached() -> str:
     min_datetime = datetime.now() - timedelta(days=2)
     orders = _repository.find_by_datetime_placed_greater_than(min_datetime)
 

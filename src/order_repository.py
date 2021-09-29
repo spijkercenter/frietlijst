@@ -23,7 +23,6 @@ class OrderRepository:
         self.__spreadsheet_id = spreadsheet_id
         self.__spreadsheet_range = spreadsheet_range
 
-    @cached(cache=TTLCache(maxsize=1, ttl=10))
     def find_by_datetime_placed_greater_than(self, min_datetime: datetime) -> List[Order]:
         result: List[List[str]] = self.__sheets.values().get(
             spreadsheetId=self.__spreadsheet_id,
