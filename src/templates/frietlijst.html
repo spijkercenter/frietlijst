@@ -6,20 +6,21 @@
 </head>
 <body>
 <div class="markdown-body">
-    <h1>Reeds besteld</h1>
+    <h1>Frietlijst by Ivo</h1>
+    <h2>Reeds besteld</h2>
     <ol>
         {% for applicant in applicants %}
         <li>{{ applicant }}</li>
         {% endfor %}
     </ol>
 
-    <h1>Streeplijst - {{ item_count }} stuks</h1>
+    <h2>Streeplijst - {{ item_count }} stuks</h2>
     <ul>
         {% for item in items %}
         <li>{{ item.name }}: {{ item.amount }}</li>
         {% endfor %}
     </ul>
-    <h1>Totaaloverzicht</h1>
+    <h2>Totaaloverzicht</h2>
     <ul>
         {% for order in orders %}
         <li>

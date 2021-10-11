@@ -1,3 +1,4 @@
+import re
 from typing import List, Dict
 
 import Levenshtein
@@ -10,6 +11,10 @@ class ItemService:
     @staticmethod
     def _translate_part(item_names: List[str], old: str, new: str) -> List[str]:
         return [i.replace(old, new) for i in item_names]
+
+    @staticmethod
+    def _translate_part_regex(item_names: List[str], regex: str, new: str) -> List[str]:
+        return [re.sub(regex, new, i) for i in item_names]
 
     @staticmethod
     def _translate_whole(item_names: List[str], old: str, new: str) -> List[str]:
@@ -25,7 +30,7 @@ class ItemService:
                     distance = Levenshtein.distance(lhs, rhs)
                     if distance <= 2:
                         print(lhs + ":" + rhs + " = " + str(distance))
-                        ItemService._translate_whole(item_names, lhs, rhs)
+                        item_names = ItemService._translate_whole(item_names, lhs, rhs)
         return item_names
 
     @staticmethod
@@ -40,6 +45,11 @@ class ItemService:
     @staticmethod
     def get_items_from_orders(orders: List[Order]):
         item_names: List[str] = _flatten([o.items for o in orders])
+        item_names = ItemService._translate_part_regex(item_names, r" ?\+ ?", " + ")
+        item_names = ItemService._translate_part_regex(item_names, r" met$", " met mayo")
+        item_names = ItemService._translate_part_regex(item_names, r" (mayo[^ ]*)", " mayo")
+        item_names = ItemService._translate_part_regex(item_names, r" sat[eé](saus)?", " saté")
+        item_names = ItemService._translate_part(item_names, "patat", "friet")
         item_names = ItemService._translate_part(item_names, "frietje", "friet")
         item_names = ItemService._translate_part(item_names, "krul friet", "twister")
         item_names = ItemService._translate_part(item_names, "krulfriet", "twister")
