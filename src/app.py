@@ -1,13 +1,20 @@
 from datetime import datetime, timedelta
 
 from cachetools import cached, TTLCache
-from flask import render_template
+from flask import render_template, Flask
 
 from item_service import ItemService
 from order_repository import OrderRepository
 
+app = Flask(__name__)
+_repository = OrderRepository(
+    sa_file_name='token.json',
+    spreadsheet_id='18vCgc5DGUiFZN1NX_GBmxSBCb47KdsBkV6Glf9Sx-wE',
+    spreadsheet_range='Friet bestelling!A2:F',
+)
 
-def process(_) -> str:
+@app.route('/')
+def process() -> str:
     return process_cached()
 
 
@@ -29,8 +36,4 @@ def process_cached() -> str:
 
 
 if __name__ == 'main':
-    _repository = OrderRepository(
-        sa_file_name='token.json',
-        spreadsheet_id='18vCgc5DGUiFZN1NX_GBmxSBCb47KdsBkV6Glf9Sx-wE',
-        spreadsheet_range='Friet bestelling!A2:F',
-    )
+    app.run(debug==True)
